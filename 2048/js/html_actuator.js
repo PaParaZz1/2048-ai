@@ -147,5 +147,5 @@ HTMLActuator.prototype.setRunButton = function(message) {
 };
 
 HTMLActuator.prototype.showHint = function(hint) {
-  document.getElementById("hint-button").innerHTML = ['↑','→','↓','←'][hint];
+  document.getElementById("hint-button").innerHTML = ['上 ↑','右 →','下 ↓','左 ←'][hint];
 }

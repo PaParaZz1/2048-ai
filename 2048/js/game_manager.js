@@ -11,8 +11,9 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
-  this.inputManager.on("autoRun", this.autoRun.bind(this));
+  this.inputManager.on("mode", this.mode.bind(this));
   this.inputManager.on("hint", this.hint.bind(this));
+  this.inputManager.on("generate", this.generate.bind(this));
 
   this.setup();
 }
@@ -133,10 +134,13 @@ GameManager.prototype.moveTile = function (tile, cell) {
 };
 
 // Move tiles on the grid in the specified direction
-GameManager.prototype.move = function (direction) {
+GameManager.prototype.move = function (direction, auto_move) {
   // 0: up, 1: right, 2: down, 3: left
   var self = this;
 
+  if (!this.running && !auto_move) {
+    return;  // return when debug mode, only AI can move
+  }
   if (this.isGameTerminated()) return; // Don't do anything if the game's over
 
   var cell, tile;
@@ -186,7 +190,10 @@ GameManager.prototype.move = function (direction) {
   });
 
   if (moved) {
-    this.addRandomTile();
+    if (!auto_move) {
+      this.addRandomTile();
+
+    }
 
     if (!this.movesAvailable()) {
       this.over = true; // Game over!
@@ -277,7 +284,7 @@ GameManager.prototype.positionsEqual = function (first, second) {
   return first.x === second.x && first.y === second.y;
 };
 
-GameManager.prototype.sendMessage = function (isHint) {
+GameManager.prototype.sendMessage = function () {
   var self=this;
   if (window["WebSocket"]) {
     if(!self.ws){
@@ -286,39 +293,30 @@ GameManager.prototype.sendMessage = function (isHint) {
         protocol="wss://";
       }
       self.ws = new WebSocket(protocol+window.location.host+"/compute");
-      self.ws.onopen = function(evt) { 
-        if(!isHint){
-          self.running=true;
-        }
-        console.log("Connection open ..."); 
+      self.ws.onopen = function(evt) {
+        console.log("Connection open ...");
         self.ws.send(JSON.stringify({
           data: self.grid.toArray()
         }));
         self.updateButton();
       };
-      
+
       self.ws.onmessage = function(evt) {
         var resp=JSON.parse(evt.data);
         console.log( "Received Message: " + resp.dire);
-        self.actuator.showHint(resp.dire);
-        if(self.run(resp.dire)){
-          self.ws.send(JSON.stringify({
-            data: self.grid.toArray()
-          }));
-        }
+        self.run(resp.dire);
       };
-      
+
       self.ws.onclose = function(evt) {
-        self.running=false;
         console.log("Connection closed.");
         self.updateButton();
-      };   
+      };
     }else{
       self.ws.send(JSON.stringify({
         data: self.grid.toArray()
       }));
       self.updateButton();
-    }  
+    }
   } else {
     var item = document.createElement("div");
     item.innerHTML = "<b>Your browser does not support WebSockets.</b>";
@@ -326,42 +324,53 @@ GameManager.prototype.sendMessage = function (isHint) {
   }
 }
 
-GameManager.prototype.autoRun = function () {
+GameManager.prototype.mode = function () {
   var self=this;
-  if(this.running){
+  if (this.running) {
     this.running=false;
-  }else{
+  } else {
     this.running=true;
-    this.sendMessage(false);
   }
   this.updateButton()
 };
 
 GameManager.prototype.hint = function () {
-  this.sendMessage(true);
+  var self=this;
+  if (this.running) {
+    this.sendMessage();
+  }
+};
+GameManager.prototype.generate = function (loc) {
+  if (!this.running && this.grid.cellsAvailable()) {
+    var emptyTile = this.grid.locationToTile(loc);
+    if (emptyTile) {
+      var value = Math.random() < 0.9 ? 2 : 4;
+      var tile = new Tile(emptyTile, value);
+      this.grid.insertTile(tile);
+      this.actuate();
+      this.sendMessage();
+    }
+  }
 };
 
 GameManager.prototype.updateButton = function () {
   if(!this.running){
-    this.actuator.setRunButton('AutoRun');
-    this.actuator.setHint('Hint');
+    this.actuator.setRunButton('捉虫模式');
+    this.actuator.setHint('');
   }else{
-    this.actuator.setRunButton('Stop');
+    this.actuator.setRunButton('协作模式');
+    this.actuator.setHint('AI助力');
   }
 };
 
 // moves continuously until game is over
 GameManager.prototype.run = function(dire) {
-  if(!this.running){
-    return
-  }
   if(this.over){
-    this.running=false;
     this.updateButton()
     return
   }
-  this.move(dire);
+  this.move(dire, !this.running);
 
   var self = this;
-  return this.running && !this.over && !this.won
+  return !this.over && !this.won
 };

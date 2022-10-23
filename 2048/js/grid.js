@@ -133,3 +133,19 @@ Grid.prototype.toArray = function () {
   }
   return data
 };
+
+Grid.prototype.locationToTile = function (loc) {
+  const Y = loc[0];
+  const X = loc[1];
+  var findCells = [];
+
+  this.eachCell(function (x, y, tile) {
+    if (!tile && (x == X) && (y == Y)) {
+      findCells.push({ x: x, y: y });
+    }
+  });
+  if (findCells.length) {
+    return findCells[0];
+  }
+  return null;
+};

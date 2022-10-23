@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>2048</title>
+  <title>1024</title>
 
   <link href="style/main.css" rel="stylesheet" type="text/css">
   <link href="style/ai.css" rel="stylesheet" type="text/css">
@@ -20,24 +20,23 @@
 <body>
   <div class="container">
     <div class="heading">
-      <h1 class="title">2048</h1>
+      <h1 class="title">1024</h1>
       <div class="scores-container">
         <div class="score-container">0</div>
         <div class="best-container">0</div>
       </div>
     </div>
     <div class="above-game">
-      <a id="ai-button" class="ai-button">AutoRun</a>
-      <a id="hint-button" class="hint-button">Hint</a>
-      <a class="restart-button">NewGame</a>
+      <a id="ai-button" class="ai-button">捉虫模式</a>
+      <a id="hint-button" class="hint-button"></a>
+      <a class="restart-button">新游戏</a>
     </div>
 
     <div class="game-container">
       <div class="game-message">
-        <p></p>
         <div class="lower">
 	        <a class="keep-playing-button">Keep going</a>
-          <a class="retry-button">Try again</a>
+          <a class="retry-button">再来一次</a>
         </div>
       </div>
 
@@ -74,8 +73,12 @@
     </div>
     <br/>
     <hr/>
-    <p>
-    Project source code <a href="https://github.com/xwjdsh/2048-ai" target="_blank">2048-ai</a>.
+    <p align="center">
+    <b>捉虫模式</b>：鼠标点击格子设置下一个方块，AI会自动做出应对，尝试寻找AI解决不了的情形~
+    <br/>
+    <b>协作模式</b>：键盘/触摸屏操作进行移动，或者可以请求AI助力自动执行一步，人机协作追求最高分。
+    <br/>
+    Powered by <a href="https://github.com/opendilab" target="_blank">OpenDILab</a>
     </p>
   </div>
 

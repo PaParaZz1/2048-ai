@@ -58,7 +58,7 @@ KeyboardInputManager.prototype.listen = function () {
     if (!modifiers) {
       if (mapped !== undefined) {
         event.preventDefault();
-        self.emit("move", mapped);
+        self.emit("move", mapped, false);
       }
     }
 
@@ -68,11 +68,21 @@ KeyboardInputManager.prototype.listen = function () {
     }
   });
 
+  document.addEventListener('click', function(event){
+    const inteval = 121;
+    var o = document.getElementsByClassName("game-container")[0];
+    const Y = Math.floor((event.clientY - o.offsetTop) / inteval);
+    const X = Math.floor((event.clientX - o.offsetLeft) / inteval);
+    // console.log('mouseup', event.clientY, event.clientX, o.offsetTop, o.offsetLeft, Y, X);
+    event.preventDefault();
+    self.emit("generate", [Y, X]);
+  });
+
   // Respond to button presses
   this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".restart-button", this.restart);
   this.bindButtonPress(".hint-button", this.hint);
-  this.bindButtonPress(".ai-button", this.autoRun); 
+  this.bindButtonPress(".ai-button", this.mode);
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
 
   // Respond to swipe events
@@ -133,8 +143,8 @@ KeyboardInputManager.prototype.hint = function (event) {
   this.emit("hint");
 };
 
-KeyboardInputManager.prototype.autoRun = function (event) {
-  this.emit("autoRun");
+KeyboardInputManager.prototype.mode = function (event) {
+  this.emit("mode");
 };
 
 KeyboardInputManager.prototype.restart = function (event) {
