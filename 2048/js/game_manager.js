@@ -10,20 +10,28 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
+  this.inputManager.on("restartWithData", this.restartWithData.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
   this.inputManager.on("mode", this.mode.bind(this));
   this.inputManager.on("hint", this.hint.bind(this));
   this.inputManager.on("generate", this.generate.bind(this));
 
-  this.setup();
+  this.setup(null);
 }
 
 // Restart the game
 GameManager.prototype.restart = function () {
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
-  this.setup();
+  this.setup(null);
   this.running=false;
+  this.updateButton();
+};
+GameManager.prototype.restartWithData = function (data) {
+  var parsedData = data.split(',');
+  this.storageManager.clearGameState();
+  this.actuator.continueGame(); // Clear the game won/lost message
+  this.setup(parsedData);
   this.updateButton();
 };
 
@@ -39,8 +47,12 @@ GameManager.prototype.isGameTerminated = function () {
 };
 
 // Set up the game
-GameManager.prototype.setup = function () {
+GameManager.prototype.setup = function (data) {
   var previousState = this.storageManager.getGameState();
+  if (data) {
+    previousState = null;
+  }
+
 
   // Reload the game from a previous game if present
   if (previousState) {
@@ -58,7 +70,17 @@ GameManager.prototype.setup = function () {
     this.keepPlaying = false;
 
     // Add the initial tiles
-    this.addStartTiles();
+      if (data) {
+        for (var i = 0; i < data.length; i++) {
+           const value = parseInt(data[i]);
+           if (value != 0) {
+             var tile = new Tile({y: Math.floor(i / 4), x: i % 4}, value);
+             this.grid.insertTile(tile);
+           }
+        }
+      } else {
+        this.addStartTiles();
+      }
   }
 
   // Update the actuator
@@ -287,6 +309,9 @@ GameManager.prototype.positionsEqual = function (first, second) {
 GameManager.prototype.sendMessage = function () {
   var self=this;
   if (window["WebSocket"]) {
+    if (self.ws && (self.ws.readyState !== self.ws.OPEN)) {
+        self.ws = null;
+    }
     if(!self.ws){
       var protocol="ws://";
       if(window.location.protocol=="https:"){
@@ -311,7 +336,7 @@ GameManager.prototype.sendMessage = function () {
         console.log("Connection closed.");
         self.updateButton();
       };
-    }else{
+    } else {
       self.ws.send(JSON.stringify({
         data: self.grid.toArray()
       }));
