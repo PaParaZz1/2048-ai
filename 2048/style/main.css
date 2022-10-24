@@ -526,10 +526,16 @@ hr {
   text-decoration: none;
   color: #f9f6f2;
   height: 40px;
+  width: 15%;
   line-height: 42px;
   display: block;
   text-align: center;
   float: right; }
+
+.add-button {
+  background: #8f7a66;
+  color: #f9f6f2;
+  }
 
 .game-explanation {
   margin-top: 50px; }
@@ -565,7 +571,7 @@ hr {
     line-height: 1.65; }
 
   .restart-button {
-    width: 42%;
+    width: 35%;
     padding: 0;
     display: block;
     box-sizing: border-box;

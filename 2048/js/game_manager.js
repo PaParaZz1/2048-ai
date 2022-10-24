@@ -382,9 +382,13 @@ GameManager.prototype.updateButton = function () {
   if(!this.running){
     this.actuator.setRunButton('捉虫模式');
     this.actuator.setHint('');
+    var ui = document.getElementById("hint-button");
+    ui.style.visibility="hidden";
   }else{
     this.actuator.setRunButton('协作模式');
     this.actuator.setHint('AI助力');
+    var ui = document.getElementById("hint-button");
+    ui.style.visibility="visible";
   }
 };
 
