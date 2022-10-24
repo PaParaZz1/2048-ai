@@ -77,6 +77,15 @@ KeyboardInputManager.prototype.listen = function () {
     event.preventDefault();
     self.emit("generate", [Y, X]);
   });
+  document.addEventListener(this.eventTouchend, function(event){
+    const inteval = 121;
+    var o = document.getElementsByClassName("game-container")[0];
+    const Y = Math.floor((event.clientY - o.offsetTop) / inteval);
+    const X = Math.floor((event.clientX - o.offsetLeft) / inteval);
+    event.preventDefault();
+    self.emit("generate", [Y, X]);
+  });
+
 
   // Respond to button presses
   this.bindButtonPress(".retry-button", this.restart);
@@ -141,10 +150,12 @@ KeyboardInputManager.prototype.listen = function () {
 };
 
 KeyboardInputManager.prototype.hint = function (event) {
+  event.preventDefault();
   this.emit("hint");
 };
 
 KeyboardInputManager.prototype.mode = function (event) {
+  event.preventDefault();
   this.emit("mode");
 };
 
@@ -170,5 +181,6 @@ KeyboardInputManager.prototype.keepPlaying = function (event) {
 KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
   var button = document.querySelector(selector);
   button.addEventListener("click", fn.bind(this));
-  button.addEventListener(this.eventTouchend, fn.bind(this));
+  button.addEventListener(this.eventTouchstart, fn.bind(this));
+  //button.addEventListener(this.eventTouchend, fn.bind(this));
 };

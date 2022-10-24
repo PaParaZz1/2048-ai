@@ -6,6 +6,8 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 
   this.startTiles     = 2;
   this.running        = false;
+  var ui = document.getElementById("hint-button");
+  ui.style.visibility = "hidden";
   this.ws;
 
   this.inputManager.on("move", this.move.bind(this));
@@ -383,12 +385,12 @@ GameManager.prototype.updateButton = function () {
     this.actuator.setRunButton('捉虫模式');
     this.actuator.setHint('');
     var ui = document.getElementById("hint-button");
-    ui.style.visibility="hidden";
+    ui.style.visibility = "hidden";
   }else{
     this.actuator.setRunButton('协作模式');
     this.actuator.setHint('AI助力');
     var ui = document.getElementById("hint-button");
-    ui.style.visibility="visible";
+    ui.style.visibility = "visible";
   }
 };
 
