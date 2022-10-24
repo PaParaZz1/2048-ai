@@ -71,17 +71,9 @@ KeyboardInputManager.prototype.listen = function () {
   document.addEventListener('click', function(event){
     const inteval = 121;
     var o = document.getElementsByClassName("game-container")[0];
-    const Y = Math.floor((event.clientY - o.offsetTop) / inteval);
-    const X = Math.floor((event.clientX - o.offsetLeft) / inteval);
-    // console.log('mouseup', event.clientY, event.clientX, o.offsetTop, o.offsetLeft, Y, X);
-    event.preventDefault();
-    self.emit("generate", [Y, X]);
-  });
-  document.addEventListener(this.eventTouchend, function(event){
-    const inteval = 121;
-    var o = document.getElementsByClassName("game-container")[0];
-    const Y = Math.floor((event.clientY - o.offsetTop) / inteval);
-    const X = Math.floor((event.clientX - o.offsetLeft) / inteval);
+    const Y = Math.floor((event.pageY - o.offsetTop) / inteval);
+    const X = Math.floor((event.pageX - o.offsetLeft) / inteval);
+    // console.log('mouseup', event.pageY, event.pageX, o.offsetTop, o.offsetLeft, Y, X);
     event.preventDefault();
     self.emit("generate", [Y, X]);
   });
@@ -109,11 +101,17 @@ KeyboardInputManager.prototype.listen = function () {
       touchStartClientX = event.pageX;
       touchStartClientY = event.pageY;
     } else {
-      touchStartClientX = event.touches[0].clientX;
-      touchStartClientY = event.touches[0].clientY;
+      touchStartClientX = event.touches[0].pageX;
+      touchStartClientY = event.touches[0].pageY;
     }
 
     event.preventDefault();
+    var o = document.getElementsByClassName("game-container")[0];
+    const inteval = 67;
+    const Y = Math.floor((touchStartClientY - o.offsetTop) / inteval);
+    const X = Math.floor((touchStartClientX - o.offsetLeft) / inteval);
+    // console.log('mouseup', touchStartClientY, touchStartClientX, o.offsetTop, o.offsetLeft, Y, X);
+    self.emit("generate", [Y, X]);
   });
 
   gameContainer.addEventListener(this.eventTouchmove, function (event) {
