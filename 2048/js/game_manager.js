@@ -13,7 +13,6 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("restartWithData", this.restartWithData.bind(this));
-  this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
   this.inputManager.on("mode", this.mode.bind(this));
   this.inputManager.on("hint", this.hint.bind(this));
   this.inputManager.on("generate", this.generate.bind(this));
@@ -37,15 +36,10 @@ GameManager.prototype.restartWithData = function (data) {
   this.updateButton();
 };
 
-// Keep playing after winning (allows going over 2048)
-GameManager.prototype.keepPlaying = function () {
-  this.keepPlaying = true;
-  this.actuator.continueGame(); // Clear the game won/lost message
-};
 
 // Return true if the game is lost, or has won and the user hasn't kept playing
 GameManager.prototype.isGameTerminated = function () {
-  return this.over || (this.won && !this.keepPlaying);
+  return this.over || this.won;
 };
 
 // Set up the game
@@ -63,13 +57,11 @@ GameManager.prototype.setup = function (data) {
     this.score       = previousState.score;
     this.over        = previousState.over;
     this.won         = previousState.won;
-    this.keepPlaying = previousState.keepPlaying;
   } else {
     this.grid        = new Grid(this.size);
     this.score       = 0;
     this.over        = false;
     this.won         = false;
-    this.keepPlaying = false;
 
     // Add the initial tiles
       if (data) {
@@ -136,7 +128,6 @@ GameManager.prototype.serialize = function () {
     score:       this.score,
     over:        this.over,
     won:         this.won,
-    keepPlaying: this.keepPlaying
   };
 };
 
@@ -331,7 +322,12 @@ GameManager.prototype.sendMessage = function () {
       self.ws.onmessage = function(evt) {
         var resp=JSON.parse(evt.data);
         console.log( "Received Message: " + resp.dire);
-        self.run(resp.dire);
+        if (resp.dire === 4) {
+          self.won = true; // won the game with AI
+          self.actuate();
+        } else {
+          self.run(resp.dire);
+        }
       };
 
       self.ws.onclose = function(evt) {
