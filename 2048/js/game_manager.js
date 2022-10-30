@@ -7,6 +7,8 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.startTiles     = 2;
   this.running        = false;
   var ui = document.getElementById("hint-button");
+  this.initSeed           = 314;  // only activate when call generate method
+  this.seed               = 314;
   ui.style.visibility = "hidden";
   this.ws;
 
@@ -30,6 +32,7 @@ GameManager.prototype.restart = function () {
 };
 GameManager.prototype.restartWithData = function (data) {
   var parsedData = data.split(',');
+  this.seed = this.initSeed;
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
   this.setup(parsedData);
@@ -367,7 +370,10 @@ GameManager.prototype.generate = function (loc) {
   if (!this.running && this.grid.cellsAvailable()) {
     var emptyTile = this.grid.locationToTile(loc);
     if (emptyTile) {
-      var value = Math.random() < 0.9 ? 2 : 4;
+      this.seed = (this.seed * 9301 + 49297) % 233280;
+      const rnd = this.seed / 233280.0;
+      var value = rnd < 0.9 ? 2 : 4;
+      console.log(rnd, value);
       var tile = new Tile(emptyTile, value);
       this.grid.insertTile(tile);
       this.actuate();
