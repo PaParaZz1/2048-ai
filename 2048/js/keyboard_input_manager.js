@@ -172,8 +172,8 @@ KeyboardInputManager.prototype.add = function (event) {
     var parsedData = data[0].split(',');
     for (var i = 0; i < parsedData.length; i++) {
       const value = parseInt(parsedData[i]);
-      if (value % 2 !== 0) {
-        console.log('illegal', i, value);
+      if ((value < 0) || (value == 1) || ((value & (value - 1)) != 0)) {
+          console.log('illegal', i, value);
           err_flag = true;
           break;
       }
