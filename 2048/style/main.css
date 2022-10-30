@@ -537,6 +537,13 @@ hr {
   background: #8f7a66;
   color: #f9f6f2;
   }
+.result-text {
+  color: #8f7a66;
+  font-size: 12px;
+  text-decoration: none;
+  font-weight: none;
+  cursor: none;
+  }
 
 .game-explanation {
   margin-top: 50px; }

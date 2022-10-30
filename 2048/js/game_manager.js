@@ -31,11 +31,10 @@ GameManager.prototype.restart = function () {
   this.updateButton();
 };
 GameManager.prototype.restartWithData = function (data) {
-  var parsedData = data.split(',');
   this.seed = this.initSeed;
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
-  this.setup(parsedData);
+  this.setup(data);
   this.updateButton();
 };
 
